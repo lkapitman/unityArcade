@@ -9,15 +9,16 @@ public class GameController : MonoBehaviour
 {
     private CubePos _nowCube = new CubePos(0, 1, 0);
     private const float CubeChangePlaceSpeed = 0.5f;
+    public GameObject[] canvasStartPage;
+    
     public Transform cubeToPlace;
     private Rigidbody _allCubesRb;
-    private bool _isLose;
+    private bool _isLose, _fistCube;
         
     public GameObject cubeToCreate, allCubes; 
     
     private readonly List<Vector3> _allCubesPositions = new List<Vector3>
     {
-        new Vector3(0, 0, 0),
         new Vector3(1, 0, 0),
         new Vector3(-1, 0, 0),
         new Vector3(0, 1, 0),
@@ -40,7 +41,7 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
-        if ((Input.GetMouseButtonDown(0) || Input.touchCount > 0) && cubeToPlace != null && allCubes != null && !EventSystem.current.IsPointerOverGameObject())
+        if ((Input.GetMouseButtonDown(0) || Input.touchCount > 0) && cubeToPlace != null && allCubes != null && !EventSystem.current.IsPointerOverGameObject() && !EventSystem.current.IsPointerOverGameObject())
         {
             #if !UNITY_EDITOR
             if (Input.GetTouch(0).phase != TouchPhase.Began)
@@ -48,7 +49,16 @@ public class GameController : MonoBehaviour
                 return;
             }
             #endif
-
+            
+            if (!_fistCube)
+            {
+                _fistCube = true;
+                foreach (var obj in canvasStartPage)
+                {
+                    Destroy(obj);                    
+                }
+            }
+            
             var newCube = Instantiate(cubeToCreate, cubeToPlace.position, Quaternion.identity) as GameObject;
             newCube.transform.SetParent(allCubes.transform);
             
@@ -91,8 +101,6 @@ public class GameController : MonoBehaviour
         
         if (IsPositionEmpty(new Vector3(_nowCube.X, _nowCube.Y + 1, _nowCube.Z)) && _nowCube.Y + 1!= cubeToPlace.position.y)
             positions.Add(new Vector3(_nowCube.X, _nowCube.Y + 1, _nowCube.Z));
-        if (IsPositionEmpty(new Vector3(_nowCube.X, _nowCube.Y - 1, _nowCube.Z)) && _nowCube.Y - 1!= cubeToPlace.position.y)
-            positions.Add(new Vector3(_nowCube.X, _nowCube.Y - 1, _nowCube.Z));
         
         if (IsPositionEmpty(new Vector3(_nowCube.X, _nowCube.Y, _nowCube.Z + 1))  && _nowCube.Z + 1!= cubeToPlace.position.z)
             positions.Add(new Vector3(_nowCube.X, _nowCube.Y, _nowCube.Z + 1));
