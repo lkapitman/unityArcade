@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class GameController : MonoBehaviour
 {
@@ -10,7 +11,8 @@ public class GameController : MonoBehaviour
     private const float CubeChangePlaceSpeed = 0.5f;
     public Transform cubeToPlace;
     private Rigidbody _allCubesRb;
-    
+    private bool _isLose;
+        
     public GameObject cubeToCreate, allCubes; 
     
     private readonly List<Vector3> _allCubesPositions = new List<Vector3>
@@ -26,17 +28,19 @@ public class GameController : MonoBehaviour
         new Vector3(-1, 0, 1),
         new Vector3(1, 0, -1)
     };
+
+    private Coroutine _showCubePlace;
     
     private void Start()
     {
         _allCubesRb = allCubes.GetComponent<Rigidbody>();
         
-        StartCoroutine(ShowCubePlace());
+        _showCubePlace = StartCoroutine(ShowCubePlace());
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) || Input.touchCount > 0)
+        if ((Input.GetMouseButtonDown(0) || Input.touchCount > 0) && cubeToPlace != null && allCubes != null && !EventSystem.current.IsPointerOverGameObject())
         {
             #if !UNITY_EDITOR
             if (Input.GetTouch(0).phase != TouchPhase.Began)
@@ -56,7 +60,14 @@ public class GameController : MonoBehaviour
             
             SpawnPositions();
             
-        }        
+        }
+
+        if (!_isLose && _allCubesRb.velocity.magnitude > 0.1f)
+        {
+            Destroy(cubeToPlace.gameObject);
+            _isLose = true;
+            StopCoroutine(_showCubePlace);
+        }
     }
 
     private IEnumerator ShowCubePlace()
