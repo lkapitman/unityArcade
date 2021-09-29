@@ -13,6 +13,9 @@ public class GameController : MonoBehaviour
     
     public Transform cubeToPlace;
     private Rigidbody _allCubesRb;
+
+    public Color[] bgColors;
+    
     private bool _isLose, _fistCube;
 
     private float _camMoveToYPosition;
@@ -157,7 +160,18 @@ public class GameController : MonoBehaviour
         mainCamera.localPosition -= new Vector3(0, 0, 2f);
         _prevCountMaxHorizontal = maxHor;
 
-        
+        if (maxY >= 7)
+        {
+            Camera.main.backgroundColor = bgColors[2];
+        }
+        else if (maxY >= 5)
+        {
+            Camera.main.backgroundColor = bgColors[1];
+        }
+        else if (maxY >= 2)
+        {
+            Camera.main.backgroundColor = bgColors[0];
+        }
     }
 }
 
