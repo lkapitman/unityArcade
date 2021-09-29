@@ -14,7 +14,9 @@ public class GameController : MonoBehaviour
     public Transform cubeToPlace;
     private Rigidbody _allCubesRb;
     private bool _isLose, _fistCube;
-        
+
+    private float _camMoveToYPosition;
+    
     public GameObject cubeToCreate, allCubes; 
     
     private readonly List<Vector3> _allCubesPositions = new List<Vector3>
@@ -69,15 +71,14 @@ public class GameController : MonoBehaviour
             _allCubesRb.isKinematic = false;
             
             SpawnPositions();
-            
+            MoveCameraChangeBg();
         }
 
-        if (!_isLose && _allCubesRb.velocity.magnitude > 0.1f)
-        {
-            Destroy(cubeToPlace.gameObject);
-            _isLose = true;
-            StopCoroutine(_showCubePlace);
-        }
+        if (_isLose || !(_allCubesRb.velocity.magnitude > 0.1f)) return;
+        
+        Destroy(cubeToPlace.gameObject);
+        _isLose = true;
+        StopCoroutine(_showCubePlace);
     }
 
     private IEnumerator ShowCubePlace()
@@ -115,6 +116,28 @@ public class GameController : MonoBehaviour
     private bool IsPositionEmpty(Vector3 targetPos)
     {
         return _allCubesPositions.Any(pos => pos.x == targetPos.x || pos.y == targetPos.y || pos.z == targetPos.z);
+    }
+
+    private void MoveCameraChangeBg()
+    {
+        int maxX = 0, maxY = 0, maxZ = 0;
+
+        foreach (var pos in _allCubesPositions)
+        {
+            if (Mathf.Abs(Convert.ToInt32(pos.x)) > maxX)
+                maxX = Convert.ToInt32(pos.x);
+            
+            if (Convert.ToInt32(pos.y) > maxY)
+                maxY = Convert.ToInt32(pos.y);
+            
+            if (Mathf.Abs(Convert.ToInt32(pos.z)) > maxZ)
+                maxZ = Convert.ToInt32(pos.z);
+        }
+        
+        var mainCamera = Camera.main.transform;
+        _camMoveToYPosition = 5.9f + _nowCube.Y - 1f;
+        
+        mainCamera.localPosition = new Vector3(mainCamera.localPosition.x, _camMoveToYPosition, mainCamera.localPosition.z);
     }
 }
 
