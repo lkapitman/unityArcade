@@ -19,7 +19,13 @@ public class ExplodeCubes : MonoBehaviour
             child.gameObject.GetComponent<Rigidbody>().AddExplosionForce(70f, Vector3.up, 5f);
             child.SetParent(null);
         }
+        
         restartButton.SetActive(true);
+        
+        Camera.main.transform.localPosition -= new Vector3(0, 0, 3f);
+        Camera.main.gameObject.AddComponent<CameraShake>();
+        
         Destroy(collision.gameObject);
+        _collisionSet = true;
     }
 }

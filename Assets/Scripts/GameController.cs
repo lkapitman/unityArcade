@@ -172,6 +172,7 @@ public class GameController : MonoBehaviour
         {
             Camera.main.backgroundColor = bgColors[0];
         }
+        
     }
 }
 
